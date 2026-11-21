@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Arcade</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #292929;
+    color: white;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 22px;
+    background: #171717;
+    border-bottom: 3px solid #555;
+}
+
+.logo {
+    font-size: 38px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1300px;
+    margin: auto;
+    align-items: start;
+}
+
+/* GAME LIBRARY */
+
+.game-panel {
+    background: #dedede;
+    color: #171717;
+    border-radius: 12px;
+    padding: 15px;
+    height: 600px;
+    overflow-y: auto;
+}
+
+.search {
+    width: 100%;
+    padding: 13px;
+    border: 2px solid #777;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.game {
+    padding: 20px 10px;
+    border: 2px solid #777;
+    border-radius: 9px;
+    background: #333;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.game:hover {
+    background: #555;
+}
+
+.show-more {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #555;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.show-more:hover {
+    background: #222;
+}
+
+/* RIGHT SIDE */
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.top-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.side-card {
+    background: #dedede;
+    color: #171717;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.side-card h2 {
+    font-size: 19px;
+    margin-top: 0;
+}
+
+.side-card button {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.request-input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #777;
+    border-radius: 6px;
+}
+
+.recent-list {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.recent-list li {
+    margin: 10px 0;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    padding: 25px;
+    background: #171717;
+    color: #aaa;
+    margin-top: 15px;
+}
+
+/* STUDY MODE */
+
+#studyMode {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #eeeeee;
+    color: #222;
+    z-index: 10;
+    text-align: center;
+    padding-top: 20vh;
+}
+
+#studyMode button {
+    padding: 12px 22px;
+    cursor: pointer;
+}
+
+/* SMALL SCREENS */
+
+@media (max-width: 650px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .game-panel {
+        height: 450px;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🎮</div>
+    <h1>Learning Arcade</h1>
+</header>
+
+<main class="layout">
+
+    <section class="game-panel">
+
+        <input
+            class="search"
+            id="search"
+            type="search"
+            placeholder="Search games..."
+        >
+
+        <div class="games" id="games"></div>
+
+        <button class="show-more" id="showMore">
+            Show More ↓
+        </button>
+
+    </section>
+
+    <aside class="side-panel">
+
+        <div class="top-buttons">
+
+            <section class="side-card">
+                <h2>Request Form</h2>
+
+                <form id="requestForm">
+                    <input
+                        class="request-input"
+                        id="requestInput"
+                        type="text"
+                        placeholder="Game name..."
+                        required
+                    >
+
+                    <button type="submit">Submit</button>
+                </form>
+
+                <p id="requestMessage"></p>
+            </section>
+
+            <section class="side-card">
+                <h2>Panic Key</h2>
+                <button onclick="toggleStudyMode()">
+                    Q
+                </button>
+            </section>
+
+        </div>
+
+        <section class="side-card">
+            <h2>Recently Played</h2>
+            <ol class="recent-list" id="recentList">
+                <li>No games played yet</li>
+            </ol>
+        </section>
+
+    </aside>
+
+</main>
+
+<footer>
+    Learning Arcade | Game and Learn
+</footer>
+
+<div id="studyMode">
+    <h1>Study Mode</h1>
+    <p>Learning Arcade is paused.</p>
+    <button onclick="toggleStudyMode()">
+        Return to Learning Arcade
+    </button>
+</div>
+
+<script>
+
+const gameNames = [
+    "Drive Mad",
+    "Polytrack",
+    "Retro Bowl",
+    "Angry Birds",
+    "Ragdoll Hit",
+    "Ragdoll Olympics",
+    "Monkey Mart",
+    "Snake.io",
+    "Hole.io",
+    "Pac-Man",
+    "Minesweeper",
+    "GeoGuessr"
+];
+
+let visibleGames = 6;
+
+let recentGames = JSON.parse(
+    localStorage.getItem("recentGames") || "[]"
+);
+
+function displayGames() {
+    const container = document.getElementById("games");
+    const search = document.getElementById("search")
+        .value.toLowerCase();
+
+    container.innerHTML = "";
+
+    gameNames
+        .slice(0, visibleGames)
+        .filter(name => name.toLowerCase().includes(search))
+        .forEach(name => {
+            const button = document.createElement("button");
+
+            button.className = "game";
+            button.textContent = name;
+
+            button.onclick = () => playGame(name);
+
+            container.appendChild(button);
+        });
+}
+
+function playGame(name) {
+    recentGames = recentGames.filter(game => game !== name);
+    recentGames.unshift(name);
+
+    recentGames = recentGames.slice(0, 10);
+
+    localStorage.setItem(
+        "recentGames",
+        JSON.stringify(recentGames)
+    );
+
+    displayRecent();
+}
+
+function displayRecent() {
+    const list = document.getElementById("recentList");
+
+    list.innerHTML = "";
+
+    if (recentGames.length === 0) {
+        list.innerHTML = "<li>No games played yet</li>";
+        return;
+    }
+
+    recentGames.forEach(game => {
+        const item = document.createElement("li");
+        item.textContent = game;
+        list.appendChild(item);
+    });
+}
+
+document.getElementById("showMore").onclick = () => {
+    visibleGames += 6;
+
+    displayGames();
+
+    if (visibleGames >= gameNames.length) {
+        document.getElementById("showMore").textContent =
+            "All games shown";
+        document.getElementById("showMore").disabled = true;
+    }
+};
+
+document.getElementById("search").addEventListener(
+    "input",
+    displayGames
+);
+
+document.getElementById("requestForm").onsubmit = event => {
+    event.preventDefault();
+
+    const name = document.getElementById("requestInput").value;
+
+    document.getElementById("requestMessage").textContent =
+        "Thanks! Your request for " + name + " was recorded.";
+
+    document.getElementById("requestInput").value = "";
+};
+
+function toggleStudyMode() {
+    const mode = document.getElementById("studyMode");
+
+    mode.style.display =
+        mode.style.display === "block" ? "none" : "block";
+}
+
+document.addEventListener("keydown", event => {
+    if (
+        event.key.toLowerCase() === "q" &&
+        !["INPUT", "TEXTAREA"].includes(
+            document.activeElement.tagName
+        )
+    ) {
+        toggleStudyMode();
+    }
+});
+
+displayGames();
+displayRecent();
+
+</script>
+
+</body>
+</html>
