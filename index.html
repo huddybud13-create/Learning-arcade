@@ -299,7 +299,7 @@ const gameNames = [
     "GeoGuesser"
 ];
 
-let visibleGames = 6;
+let visibleGames = gameNames.length;
 
 let recentGames = JSON.parse(
     localStorage.getItem("recentGames") || "[]"
